@@ -18,7 +18,7 @@ body {
     display: block;
     border: 2px solid #333;
     background: #000;
-    cursor: none;
+    cursor: pointer;
 }
 
 #gameCanvas:focus {
