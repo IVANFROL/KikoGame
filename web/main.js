@@ -317,8 +317,25 @@ class Game {
     }
 }
 
-// Start game when page loads
+// Start game when page loads and all scripts are ready
 window.addEventListener('load', () => {
-    window.game = new Game();
+    // Wait a bit to ensure all scripts are parsed
+    setTimeout(() => {
+        if (typeof Departments === 'undefined') {
+            console.error('Error: Departments is not defined. Check if departments_data.js loaded correctly.');
+            document.body.innerHTML = '<div style="color: white; padding: 20px; text-align: center;"><h1>Error loading game</h1><p>Please refresh the page. If the problem persists, check the browser console (F12).</p></div>';
+            return;
+        }
+        if (typeof CONFIG === 'undefined') {
+            console.error('Error: CONFIG is not defined. Check if config.js loaded correctly.');
+            return;
+        }
+        try {
+            window.game = new Game();
+        } catch (error) {
+            console.error('Error initializing game:', error);
+            document.body.innerHTML = '<div style="color: white; padding: 20px; text-align: center;"><h1>Error initializing game</h1><p>' + error.message + '</p><p>Check the browser console (F12) for details.</p></div>';
+        }
+    }, 100);
 });
 
