@@ -12,7 +12,19 @@ from confi import WIDTH, HEIGHT
 
 async def run():
 
-    pygame.init()
+    # Initialize pygame with error handling
+    try:
+        pygame.init()
+    except Exception as e:
+        print(f"Warning: pygame.init() failed: {e}")
+        print("Attempting to continue...")
+    
+    # Try to initialize mixer separately (for sound)
+    try:
+        pygame.mixer.init()
+    except Exception as e:
+        print(f"Warning: Sound system not available: {e}")
+        print("Game will continue without sound.")
 
     pygame.display.set_caption("KikoGame")
 

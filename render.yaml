@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: kikogame
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    envVars:
+      - key: DISPLAY
+        value: :99
+      - key: PYTHONUNBUFFERED
+        value: 1
+
