@@ -65,22 +65,13 @@ class Game {
             this.keys_pressed[e.key] = false;
         });
         
-        // Mouse
-        this.canvas.addEventListener('mousedown', (e) => {
-            e.preventDefault();
-            const rect = this.canvas.getBoundingClientRect();
-            this.mouse_x = e.clientX - rect.left;
-            this.mouse_y = e.clientY - rect.top;
-            this.handleMouseClick(this.mouse_x, this.mouse_y);
-        });
-        
-        // Also handle click event
+        // Mouse - handle clicks
         this.canvas.addEventListener('click', (e) => {
             e.preventDefault();
             const rect = this.canvas.getBoundingClientRect();
-            this.mouse_x = e.clientX - rect.left;
-            this.mouse_y = e.clientY - rect.top;
-            this.handleMouseClick(this.mouse_x, this.mouse_y);
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            this.handleMouseClick(x, y);
         });
         
         this.canvas.addEventListener('mousemove', (e) => {
@@ -91,15 +82,18 @@ class Game {
     }
 
     handleMouseClick(x, y) {
-        // Scale coordinates if canvas is scaled
+        // Scale coordinates if canvas is scaled (canvas might be displayed at different size)
         const rect = this.canvas.getBoundingClientRect();
         const scaleX = this.canvas.width / rect.width;
         const scaleY = this.canvas.height / rect.height;
         const scaledX = x * scaleX;
         const scaledY = y * scaleY;
         
+        console.log('Click at:', scaledX, scaledY, 'State:', this.state); // Debug
+        
         if (this.state === "menu") {
             const action = this.start_screen.handle_click(scaledX, scaledY, this.rules_completed);
+            console.log('Menu action:', action); // Debug
             if (action === "rules") {
                 this.rules_screen.open();
                 this.state = "rules";
