@@ -26,8 +26,11 @@ function rectCollide(rect1, rect2) {
 
 // Check if point is inside rectangle
 function pointInRect(x, y, rect) {
-    return x >= rect.x && x <= rect.x + rect.width &&
-           y >= rect.y && y <= rect.y + rect.height;
+    if (!rect) return false;
+    return x >= rect.x && 
+           x <= rect.x + rect.width &&
+           y >= rect.y && 
+           y <= rect.y + rect.height;
 }
 
 // Check if point is inside circle

@@ -67,6 +67,16 @@ class Game {
         
         // Mouse
         this.canvas.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            const rect = this.canvas.getBoundingClientRect();
+            this.mouse_x = e.clientX - rect.left;
+            this.mouse_y = e.clientY - rect.top;
+            this.handleMouseClick(this.mouse_x, this.mouse_y);
+        });
+        
+        // Also handle click event
+        this.canvas.addEventListener('click', (e) => {
+            e.preventDefault();
             const rect = this.canvas.getBoundingClientRect();
             this.mouse_x = e.clientX - rect.left;
             this.mouse_y = e.clientY - rect.top;
@@ -81,8 +91,15 @@ class Game {
     }
 
     handleMouseClick(x, y) {
+        // Scale coordinates if canvas is scaled
+        const rect = this.canvas.getBoundingClientRect();
+        const scaleX = this.canvas.width / rect.width;
+        const scaleY = this.canvas.height / rect.height;
+        const scaledX = x * scaleX;
+        const scaledY = y * scaleY;
+        
         if (this.state === "menu") {
-            const action = this.start_screen.handle_click(x, y, this.rules_completed);
+            const action = this.start_screen.handle_click(scaledX, scaledY, this.rules_completed);
             if (action === "rules") {
                 this.rules_screen.open();
                 this.state = "rules";
@@ -91,7 +108,7 @@ class Game {
                 this.state = "game";
             }
         } else if (this.state === "rules") {
-            const r = this.rules_screen.handle_click(x, y);
+            const r = this.rules_screen.handle_click(scaledX, scaledY);
             if (r === "done") {
                 this.rules_completed = true;
                 this.state = "menu";
@@ -138,7 +155,9 @@ class Game {
 
     clicked_department(x, y) {
         for (const dept of this.departments) {
-            if (pointInRect(x, y, dept.rect)) {
+            const rect = dept.rect;
+            if (x >= rect.x && x <= rect.x + rect.width &&
+                y >= rect.y && y <= rect.y + rect.height) {
                 this.soundManager.playClick();
                 return dept;
             }
