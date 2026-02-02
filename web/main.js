@@ -1,6 +1,16 @@
 // Main game loop and state management
 class Game {
     constructor() {
+        // Check if all dependencies are loaded
+        if (typeof Departments === 'undefined') {
+            console.error('Departments is not defined! Make sure departments_data.js is loaded.');
+            return;
+        }
+        if (typeof CONFIG === 'undefined') {
+            console.error('CONFIG is not defined! Make sure config.js is loaded.');
+            return;
+        }
+        
         this.canvas = document.getElementById('gameCanvas');
         this.ctx = this.canvas.getContext('2d');
         this.canvas.focus();

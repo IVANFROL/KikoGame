@@ -33,7 +33,10 @@ class Scores {
         // Game state
         this.completed_departments = new Set();
         this.total_correct_answers = 0;
-        this.max_answers = Departments.reduce((sum, d) => sum + d.questions.length, 0);
+        // Calculate max answers safely
+        this.max_answers = (typeof Departments !== 'undefined' && Departments) 
+            ? Departments.reduce((sum, d) => sum + d.questions.length, 0)
+            : 20; // fallback value
         this.game = true;
         this.game_over = false;
         this.reached_planet = false;

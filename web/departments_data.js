@@ -129,7 +129,7 @@ const Departments = [
                  "False, because the LLM is capable of synthesizing the latest market data automatically"
              ], 0],
 
-            ["A generative AI tool has provided a summary of a research paper. The summary states, "The study found that increased screen time is directly correlated with decreased attention spans in children aged 8–12." What is your next step?",
+            ["A generative AI tool has provided a summary of a research paper. The summary states, \"The study found that increased screen time is directly correlated with decreased attention spans in children aged 8–12.\" What is your next step?",
              [
                  "Accept the summary as accurate because AI tools are generally reliable",
                  "Ask the AI to provide more details about the study's methodology and results",
