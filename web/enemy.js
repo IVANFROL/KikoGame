@@ -11,8 +11,8 @@ class Komets {
         
         // Randomly choose one of two asteroid images
         const asteroids = [
-            '../PICS/Enemy/Stone1.png',
-            '../PICS/Enemy/Stone2.png'
+            'PICS/Enemy/Stone1.png',
+            'PICS/Enemy/Stone2.png'
         ];
         const chosen = asteroids[Math.floor(Math.random() * 2)];
         

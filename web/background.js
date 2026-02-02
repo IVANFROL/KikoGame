@@ -10,7 +10,7 @@ class Background {
         this.bgY2 = 0;
         
         // Load background image
-        loadImage("../PICS/Background/cosmos4.png").then(img => {
+        loadImage("PICS/Background/cosmos4.png").then(img => {
             // Scale image to 1365x763
             const canvas = document.createElement('canvas');
             canvas.width = 1365;

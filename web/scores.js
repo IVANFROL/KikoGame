@@ -8,8 +8,8 @@ class Scores {
         
         // Load UI images
         Promise.all([
-            loadImage("../PICS/Stats/gear-cog-setting.png"),
-            loadImage("../PICS/Departaments/visited depa.png")
+            loadImage("PICS/Stats/gear-cog-setting.png"),
+            loadImage("PICS/Departaments/visited depa.png")
         ]).then(([hpImg, progressImg]) => {
             // Scale health icon to 70x70
             const hpCanvas = document.createElement('canvas');

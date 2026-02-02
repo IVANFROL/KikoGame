@@ -21,7 +21,7 @@ class StartScreen {
             height: this.btn_h
         };
         
-        loadImage('../PICS/Player_right/LOGO.png').then(img => {
+        loadImage('PICS/Player_right/LOGO.png').then(img => {
             const canvas = document.createElement('canvas');
             canvas.width = 950;
             canvas.height = 300;
@@ -133,7 +133,7 @@ class RulesScreen {
         
         const rulePaths = [];
         for (let i = 1; i <= 16; i++) {
-            rulePaths.push(`../PICS/Rules/Rules/Ru${i}.png`);
+            rulePaths.push(`PICS/Rules/Rules/Ru${i}.png`);
         }
         
         loadImages(rulePaths).then(images => {

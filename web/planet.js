@@ -10,7 +10,7 @@ class Planet {
         this.x = CONFIG.WIDTH;
         this.y = 200;
         
-        loadImage("../PICS/New Hero, Rocket/last planet.png").then(img => {
+        loadImage("PICS/New Hero, Rocket/last planet.png").then(img => {
             const canvas = document.createElement('canvas');
             canvas.width = 360;
             canvas.height = 360;

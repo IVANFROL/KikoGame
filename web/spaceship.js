@@ -16,22 +16,22 @@ class Spaceship {
         
         // Load right-facing images
         const rightImages = [
-            '../PICS/Player_right/R11.png',
-            '../PICS/Player_right/R22.png',
-            '../PICS/Player_right/R33.png',
-            '../PICS/Player_right/R44.png',
-            '../PICS/Player_right/R55.png',
-            '../PICS/Player_right/R66.png'
+            'PICS/Player_right/R11.png',
+            'PICS/Player_right/R22.png',
+            'PICS/Player_right/R33.png',
+            'PICS/Player_right/R44.png',
+            'PICS/Player_right/R55.png',
+            'PICS/Player_right/R66.png'
         ];
         
         // Load left-facing images
         const leftImages = [
-            '../PICS/Player_left/L11.png',
-            '../PICS/Player_left/L22.png',
-            '../PICS/Player_left/L33.png',
-            '../PICS/Player_left/L44.png',
-            '../PICS/Player_left/L55.png',
-            '../PICS/Player_left/L66.png'
+            'PICS/Player_left/L11.png',
+            'PICS/Player_left/L22.png',
+            'PICS/Player_left/L33.png',
+            'PICS/Player_left/L44.png',
+            'PICS/Player_left/L55.png',
+            'PICS/Player_left/L66.png'
         ];
         
         Promise.all([

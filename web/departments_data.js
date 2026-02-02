@@ -3,7 +3,7 @@ const Departments = [
     {
         id: "1",
         title: "Authority 'Know & Understand'",
-        image: "../PICS/Departaments/D1.png",
+        image: "PICS/Departaments/D1.png",
         stop_x: 900,
         y: 120,
         questions: [
@@ -76,7 +76,7 @@ const Departments = [
     {
         id: "2",
         title: "Authority 'Use & Apply'",
-        image: "../PICS/Departaments/D2.png",
+        image: "PICS/Departaments/D2.png",
         stop_x: 900,
         y: 240,
         questions: [
@@ -109,7 +109,7 @@ const Departments = [
     {
         id: "3",
         title: "Authority 'Evaluate & Create'",
-        image: "../PICS/Departaments/D3.png",
+        image: "PICS/Departaments/D3.png",
         stop_x: 900,
         y: 360,
         questions: [
@@ -150,7 +150,7 @@ const Departments = [
     {
         id: "4",
         title: "Authority 'Ethics'",
-        image: "../PICS/Departaments/D4.png",
+        image: "PICS/Departaments/D4.png",
         stop_x: 900,
         y: 480,
         questions: [

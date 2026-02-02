@@ -8,7 +8,7 @@ class Key {
         this.x = CONFIG.WIDTH;
         this.y = 118 + Math.random() * (620 - 118);
         
-        loadImage("../PICS/Stats/key.png").then(img => {
+        loadImage("PICS/Stats/key.png").then(img => {
             const canvas = document.createElement('canvas');
             canvas.width = 106;
             canvas.height = 88;
