@@ -30,6 +30,10 @@ class Game {
         this.soundManager = new SoundManager();
         this.eventsManager = new EventsManager();
         
+        // Start background music immediately (как в Python: music() вызывается сразу)
+        // В Python версии music() вызывается в main.py строка 97, до игрового цикла
+        this.soundManager.playMusic();
+        
         // Game entities
         this.asteroids = [];
         this.departments = [];
@@ -52,12 +56,16 @@ class Game {
 
     setupEventListeners() {
         // Keyboard
-        document.addEventListener('keydown', (e) => {
+        document.addEventListener('keydown', async (e) => {
             this.keys_pressed[e.key] = true;
             
-            if (e.key === ' ' && this.state === 'game') {
+            if (e.key === ' ' && this.state === 'game' && this.scores.game && !this.test_screen.quiz_active) {
                 e.preventDefault();
-                this.doPause();
+                // Pause music during pause
+                this.soundManager.pauseMusic();
+                await this.doPause();
+                // Resume music after pause
+                this.soundManager.resumeMusic();
             }
         });
         
@@ -100,6 +108,7 @@ class Game {
             } else if (action === "start") {
                 this.start_game_new_session();
                 this.state = "game";
+                // Музыка уже играет с начала (запущена в конструкторе)
             }
         } else if (this.state === "rules") {
             const r = this.rules_screen.handle_click(scaledX, scaledY);
@@ -182,7 +191,7 @@ class Game {
         this.scores.total_correct_answers = 0;
         this.active_house = null;
         this.eventsManager.init_events();
-        this.soundManager.playMusic();
+        // Музыка уже играет с начала (запущена в конструкторе Game)
     }
 
     restart_run_keep_departments() {
@@ -198,7 +207,7 @@ class Game {
             this.eventsManager.pause_timers();
             this.eventsManager.schedule_planet_spawn();
         }
-        this.soundManager.playMusic();
+        // Музыка уже играет с начала (запущена в конструкторе Game)
     }
 
     spawnKey() {
@@ -236,8 +245,46 @@ class Game {
     }
 
     doPause() {
-        // Simple pause - just wait for space again
-        // In a full implementation, you'd show a pause overlay
+        // Freeze the game until SPACE is pressed again (как в Python версии)
+        let pause = true;
+        const pauseOverlay = () => {
+            if (!pause) return;
+            
+            // Dark overlay (как в Python: overlay.set_alpha(150), overlay.fill((39, 44, 78)))
+            this.ctx.fillStyle = "rgba(39, 44, 78, 0.59)";
+            this.ctx.fillRect(0, 0, CONFIG.WIDTH, CONFIG.HEIGHT);
+            
+            // Pause text (как в Python: font.render("Pause! Press SPACE to continue", True, "white"))
+            this.ctx.fillStyle = "white";
+            this.ctx.font = "50px Optima, Arial";
+            this.ctx.textAlign = "center";
+            this.ctx.fillText("Pause! Press SPACE to continue", CONFIG.WIDTH / 2, CONFIG.HEIGHT / 2);
+            
+            requestAnimationFrame(pauseOverlay);
+        };
+        
+        const handleKeyDown = (e) => {
+            if (e.key === ' ') {
+                e.preventDefault();
+                pause = false;
+                document.removeEventListener('keydown', handleKeyDown);
+            }
+        };
+        
+        document.addEventListener('keydown', handleKeyDown);
+        pauseOverlay();
+        
+        // Wait for space to be pressed
+        return new Promise((resolve) => {
+            const checkPause = () => {
+                if (!pause) {
+                    resolve();
+                } else {
+                    requestAnimationFrame(checkPause);
+                }
+            };
+            checkPause();
+        });
     }
 
     gameLoop() {

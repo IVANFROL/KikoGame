@@ -43,9 +43,20 @@ class SoundManager {
 
     playHit() {
         try {
-            this.hitSound.currentTime = 0;
-            this.hitSound.play().catch(e => {});
-        } catch (e) {}
+            // Сброс звука в начало и перезапуск (как в Python: hit_cometa.play())
+            // В Python версии каждый раз создается новый Sound объект, поэтому звук всегда играет
+            const sound = this.hitSound.cloneNode(); // Создаем копию для одновременного воспроизведения
+            sound.currentTime = 0;
+            sound.play().catch(e => {});
+            // Удаляем копию после окончания воспроизведения
+            sound.onended = () => sound.remove();
+        } catch (e) {
+            // Fallback на обычное воспроизведение
+            try {
+                this.hitSound.currentTime = 0;
+                this.hitSound.play().catch(e => {});
+            } catch (e2) {}
+        }
     }
 
     playHeal() {
@@ -55,4 +66,5 @@ class SoundManager {
         } catch (e) {}
     }
 }
+
 
