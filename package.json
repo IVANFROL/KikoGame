@@ -1,0 +1,13 @@
+{
+  "name": "kikogame",
+  "version": "1.0.0",
+  "description": "AI Knowledge Assessment Game",
+  "scripts": {
+    "dev": "python -m http.server 8000",
+    "build": "echo 'No build step needed'"
+  },
+  "keywords": ["game", "pygame", "education"],
+  "author": "",
+  "license": "MIT"
+}
+

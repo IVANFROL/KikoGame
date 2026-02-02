@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KiKoGame - AI Knowledge Assessment</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #000;
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+        }
+        #loading {
+            color: white;
+            font-size: 24px;
+            text-align: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        #loading p {
+            margin: 10px 0;
+        }
+        #game-container {
+            display: none;
+        }
+        canvas {
+            display: block;
+            border: 2px solid #333;
+            background: #000;
+        }
+        .error {
+            color: #ff4444;
+            background: #220000;
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 600px;
+            margin: 20px;
+        }
+        .info {
+            color: #44ff44;
+            background: #002200;
+            padding: 15px;
+            border-radius: 10px;
+            max-width: 800px;
+            margin: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div id="loading">
+        <p>🚀 Загрузка KiKoGame...</p>
+        <p id="status">Инициализация...</p>
+    </div>
+    <div id="game-container">
+        <canvas id="game-canvas" width="1200" height="700"></canvas>
+    </div>
+
+    <script type="module">
+        import { loadPyodide } from 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/pyodide.js';
+
+        let pyodide;
+        let gameInitialized = false;
+
+        async function loadPythonFile(filename) {
+            try {
+                const response = await fetch(filename);
+                if (!response.ok) {
+                    throw new Error(`Не удалось загрузить ${filename}: ${response.statusText}`);
+                }
+                return await response.text();
+            } catch (error) {
+                console.error(`Ошибка загрузки ${filename}:`, error);
+                throw error;
+            }
+        }
+
+        async function main() {
+            const statusEl = document.getElementById('status');
+            const loadingEl = document.getElementById('loading');
+            const gameContainer = document.getElementById('game-container');
+            const canvas = document.getElementById('game-canvas');
+
+            try {
+                // Шаг 1: Загрузка Pyodide
+                statusEl.textContent = 'Загрузка Pyodide (это может занять 1-2 минуты при первом запуске)...';
+                pyodide = await loadPyodide({
+                    indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.24.1/full/'
+                });
+
+                // Шаг 2: Установка micropip для установки пакетов
+                statusEl.textContent = 'Установка пакетного менеджера...';
+                await pyodide.loadPackage(['micropip']);
+
+                // Шаг 3: Установка pygame через micropip
+                statusEl.textContent = 'Установка pygame (это может занять время)...';
+                const micropip = pyodide.pyimport('micropip');
+                
+                try {
+                    // Пытаемся установить pygame
+                    await micropip.install('pygame');
+                    statusEl.textContent = 'pygame установлен успешно!';
+                } catch (e) {
+                    console.warn('Ошибка установки pygame:', e);
+                    throw new Error('Не удалось установить pygame. Возможно, требуется другой подход.');
+                }
+
+                // Шаг 4: Загрузка всех Python файлов
+                statusEl.textContent = 'Загрузка файлов игры...';
+                
+                const pythonFiles = [
+                    'confi.py',
+                    'background.py',
+                    'spaceship.py',
+                    'enemy.py',
+                    'Depart.py',
+                    'key.py',
+                    'planet.py',
+                    'departments_data.py',
+                    'scores.py',
+                    'sound.py',
+                    'Test.py',
+                    'start_screen.py',
+                    'Events.py',
+                    'main.py'
+                ];
+
+                for (const file of pythonFiles) {
+                    statusEl.textContent = `Загрузка ${file}...`;
+                    const code = await loadPythonFile(file);
+                    pyodide.runPython(code);
+                }
+
+                // Шаг 5: Настройка pygame для работы в браузере
+                statusEl.textContent = 'Инициализация pygame...';
+                
+                // Создаем canvas для pygame
+                pyodide.runPython(`
+import pygame
+import sys
+import asyncio
+from js import document, window
+
+# Инициализация pygame
+try:
+    pygame.init()
+    print("pygame инициализирован")
+except Exception as e:
+    print(f"Ошибка инициализации pygame: {e}")
+    raise
+
+# Настройка дисплея
+try:
+    screen = pygame.display.set_mode((1200, 700))
+    pygame.display.set_caption("KikoGame")
+    print("Дисплей настроен")
+except Exception as e:
+    print(f"Ошибка настройки дисплея: {e}")
+    raise
+                `);
+
+                // Шаг 6: Запуск игры
+                statusEl.textContent = 'Запуск игры...';
+                
+                // Запускаем игру в отдельной задаче
+                pyodide.runPythonAsync(`
+import main
+import asyncio
+
+async def run_game():
+    try:
+        await main.run()
+    except Exception as e:
+        print(f"Ошибка в игре: {e}")
+        import traceback
+        traceback.print_exc()
+
+# Запускаем игру
+asyncio.create_task(run_game())
+                `).catch(err => {
+                    console.error('Ошибка запуска игры:', err);
+                    statusEl.textContent = `Ошибка запуска: ${err.message}`;
+                });
+
+                // Скрываем загрузку и показываем игру
+                setTimeout(() => {
+                    loadingEl.style.display = 'none';
+                    gameContainer.style.display = 'block';
+                    gameInitialized = true;
+                }, 2000);
+
+                // Обработка событий мыши
+                canvas.addEventListener('mousedown', (e) => {
+                    if (!gameInitialized) return;
+                    const rect = canvas.getBoundingClientRect();
+                    const x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width));
+                    const y = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height));
+                    
+                    pyodide.runPython(`
+import pygame
+try:
+    event = pygame.event.Event(pygame.MOUSEBUTTONDOWN, {
+        'pos': (${x}, ${y}),
+        'button': ${e.button}
+    })
+    pygame.event.post(event)
+except Exception as e:
+    pass
+                    `);
+                });
+
+                canvas.addEventListener('mouseup', (e) => {
+                    if (!gameInitialized) return;
+                    const rect = canvas.getBoundingClientRect();
+                    const x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width));
+                    const y = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height));
+                    
+                    pyodide.runPython(`
+import pygame
+try:
+    event = pygame.event.Event(pygame.MOUSEBUTTONUP, {
+        'pos': (${x}, ${y}),
+        'button': ${e.button}
+    })
+    pygame.event.post(event)
+except Exception as e:
+    pass
+                    `);
+                });
+
+                canvas.addEventListener('mousemove', (e) => {
+                    if (!gameInitialized) return;
+                    const rect = canvas.getBoundingClientRect();
+                    const x = Math.floor((e.clientX - rect.left) * (canvas.width / rect.width));
+                    const y = Math.floor((e.clientY - rect.top) * (canvas.height / rect.height));
+                    
+                    pyodide.runPython(`
+import pygame
+try:
+    event = pygame.event.Event(pygame.MOUSEMOTION, {
+        'pos': (${x}, ${y})
+    })
+    pygame.event.post(event)
+except Exception as e:
+    pass
+                    `);
+                });
+
+                // Обработка событий клавиатуры
+                const keyMap = {
+                    'ArrowLeft': 'K_LEFT',
+                    'ArrowRight': 'K_RIGHT',
+                    'ArrowUp': 'K_UP',
+                    'ArrowDown': 'K_DOWN',
+                    ' ': 'K_SPACE',
+                    'Escape': 'K_ESCAPE'
+                };
+
+                window.addEventListener('keydown', (e) => {
+                    if (!gameInitialized) return;
+                    e.preventDefault();
+                    const pygameKey = keyMap[e.key];
+                    if (pygameKey) {
+                        pyodide.runPython(`
+import pygame
+try:
+    key = pygame.${pygameKey}
+    event = pygame.event.Event(pygame.KEYDOWN, {'key': key})
+    pygame.event.post(event)
+except Exception as e:
+    pass
+                        `);
+                    }
+                });
+
+                window.addEventListener('keyup', (e) => {
+                    if (!gameInitialized) return;
+                    e.preventDefault();
+                    const pygameKey = keyMap[e.key];
+                    if (pygameKey) {
+                        pyodide.runPython(`
+import pygame
+try:
+    key = pygame.${pygameKey}
+    event = pygame.event.Event(pygame.KEYUP, {'key': key})
+    pygame.event.post(event)
+except Exception as e:
+    pass
+                        `);
+                    }
+                });
+
+            } catch (error) {
+                console.error('Критическая ошибка:', error);
+                statusEl.innerHTML = `<div class="error">
+                    <h3>❌ Ошибка загрузки игры</h3>
+                    <p><strong>${error.message}</strong></p>
+                    <p style="margin-top: 15px; font-size: 14px;">
+                        К сожалению, pygame не работает напрямую в браузере через Pyodide.
+                    </p>
+                    <p style="margin-top: 10px; font-size: 14px;">
+                        <strong>Рекомендации:</strong><br>
+                        1. Используйте <a href="https://replit.com" target="_blank" style="color: #44ff44;">Replit</a> для запуска Pygame в браузере<br>
+                        2. Или перепишите игру на JavaScript/TypeScript для браузера<br>
+                        3. Проверьте консоль браузера (F12) для подробностей
+                    </p>
+                </div>`;
+                statusEl.style.color = '#ff4444';
+            }
+        }
+
+        // Запускаем загрузку
+        main().catch(err => {
+            console.error('Необработанная ошибка:', err);
+            document.getElementById('status').innerHTML = `<div class="error">Критическая ошибка: ${err.message}</div>`;
+        });
+    </script>
+</body>
+</html>
