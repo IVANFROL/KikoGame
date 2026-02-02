@@ -16,5 +16,7 @@ command = [
   "$REPL_SOURCE_FILE"
 ]
 
+# Pygame GUI applications don't need web hosting
+# Use Preview tab instead of Publishing
 [deploy]
-run = ["python3", "main.py"]
+run = ["sh", "-c", "echo 'This is a GUI application. Use Preview tab instead of Publishing.'"]
