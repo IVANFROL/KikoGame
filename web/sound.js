@@ -10,11 +10,14 @@ class SoundManager {
 
     playMusic() {
         try {
-            this.backgroundMusic.play().catch(e => {
-                console.log('Music play failed:', e);
+            // Возвращаем Promise для обработки ошибок автозапуска
+            return this.backgroundMusic.play().catch(e => {
+                // Браузер может блокировать автозапуск звука
+                // Это нормально, звук запустится при первом взаимодействии пользователя
+                return Promise.reject(e);
             });
         } catch (e) {
-            console.log('Music not available');
+            return Promise.reject(e);
         }
     }
 
@@ -43,13 +46,19 @@ class SoundManager {
 
     playHit() {
         try {
-            // Сброс звука в начало и перезапуск (как в Python: hit_cometa.play())
-            // В Python версии каждый раз создается новый Sound объект, поэтому звук всегда играет
-            const sound = this.hitSound.cloneNode(); // Создаем копию для одновременного воспроизведения
+            // В Python версии каждый раз создается новый Sound объект (hit_cometa = pygame.mixer.Sound(...))
+            // Поэтому звук всегда играет, даже если предыдущий еще не закончился
+            // В JavaScript создаем новый Audio элемент для каждого воспроизведения
+            const sound = new Audio(this.hitSound.src); // Создаем новый Audio элемент
+            sound.volume = this.hitSound.volume || 1.0;
             sound.currentTime = 0;
-            sound.play().catch(e => {});
-            // Удаляем копию после окончания воспроизведения
-            sound.onended = () => sound.remove();
+            sound.play().catch(e => {
+                // Если не удалось воспроизвести, пробуем оригинальный элемент
+                try {
+                    this.hitSound.currentTime = 0;
+                    this.hitSound.play().catch(e2 => {});
+                } catch (e2) {}
+            });
         } catch (e) {
             // Fallback на обычное воспроизведение
             try {
